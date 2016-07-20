@@ -4,14 +4,48 @@
   <title>DrunAndDrop1</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <script type="text/javascript" src="http://feather.aviary.com/imaging/v3/editor.js"></script>
   <%= csrf_meta_tags %>
 </head>
 <body>
+<script type='text/javascript'>
+  var featherEditor = new Aviary.Feather({
+    apiKey: '0f88036fc47546168cdca8fe778e7c49',
+    theme: 'dark', // Check out our new 'light' and 'dark' themes!
+    tools: 'all',
+    appendTo: '',
+    onSave: function(imageID, newURL) {
+      $.ajax
+      ({
+        type: "PUT",
+        //the url where you want to sent the userName and password to
+        url: '/uploads/'+imageID,
+        dataType: 'json',
+        async: true,
+        //json object to sent to the authentication url
+        data: { "public_id": imageID, "url" : newURL },
+        success: function () {
+          var img = document.getElementById(imageID);
+          img.src = newURL;
+        }
+      });
+      return false;
+    },
+    onError: function(errorObj) {
+      alert(errorObj.message);
+    }
+  });
+  function launchEditor(id, src) {
+    featherEditor.launch({
+      image: id,
+      url: src
+    });
+    return false;
+  }
+</script>
 <% flash.each do |message_type, message| %>
         <div class="alert alert-<%= message_type %>"><%= message %></div>
       <% end %>
-
-
 <%= yield %>
 
 </body>

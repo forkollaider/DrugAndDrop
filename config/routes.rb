@@ -1,15 +1,23 @@
 Rails.application.routes.draw do
+  resources :uploads do
+    collection do
+      get :list
+    end
+  end
+  resources :images
   get    '/login',   to: 'sessions#new'
   post   '/login',   to: 'sessions#create'
   delete '/logout',  to: 'sessions#destroy'
   resources :account_activations, only: [:edit]
   get  '/signup',  to: 'users#new'
   post '/signup',  to: 'users#create'
+  put 'uploads/:public_id', to: 'uploads#update'
   resources :users do
     member do
       get :confirm_email
     end
   end
+  resource :images
   resources :account_activations, only: [:edit]
 
   root :to => 'sessions#new'

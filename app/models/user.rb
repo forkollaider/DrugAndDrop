@@ -3,8 +3,7 @@ class User < ActiveRecord::Base
   attr_accessor :remember_token, :activation_token
   before_save   :downcase_email
   before_create :create_activation_digest
-
-
+  has_many :uploads
   validates :name,  presence: true, length: { maximum: 50 }
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email, presence: true, length: { maximum: 255 },format: { with: VALID_EMAIL_REGEX },
@@ -41,6 +40,16 @@ class User < ActiveRecord::Base
     update_columns(activated: FILL_IN, activated_at: FILL_IN)
   end
 
+  def forget(user)
+    user.forget
+    cookies.delete(:user_id)
+    cookies.delete(:remember_token)
+  end
+
+  def forget
+    update_attribute(:remember_digest, nil)
+  end
+
   private
 
   def confirmation_token
@@ -62,14 +71,6 @@ class User < ActiveRecord::Base
     update_attribute(:remember_digest, User.digest(remember_token))
   end
 
-  def forget(user)
-    user.forget
-    cookies.delete(:user_id)
-    cookies.delete(:remember_token)
-  end
 
-  def forget
-    update_attribute(:remember_digest, nil)
-  end
 end
 #end
